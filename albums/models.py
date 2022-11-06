@@ -26,6 +26,8 @@ class Album(models.Model):
         max_digits=7,
         decimal_places=2,
         blank=False)
-
+    
+    isApproved = models.BooleanField(default = False , verbose_name = 'Approved')
+    
     def __str__(self):
         return self.name

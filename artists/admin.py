@@ -1,5 +1,11 @@
 from django.contrib import admin
 from .models import *
 
-admin.site.register(Artist)
-# Register your models here.
+
+class ArtistAdmin(admin.ModelAdmin):
+    readonly_fields = ('Approved_Albums',)
+    list_display = ('stageName', 'socialLink', 'Approved_Albums')
+    fields = ['stageName', 'socialLink', 'Approved_Albums']
+
+
+admin.site.register(Artist, ArtistAdmin)
