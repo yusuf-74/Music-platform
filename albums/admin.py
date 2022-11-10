@@ -4,11 +4,12 @@ from .forms import AlbumForm
 
 
 class AlbumAdmin(admin.ModelAdmin):
-    readonly_fields = ('creationDateTime',)
-    list_display = ('name', "creationDateTime",
+    readonly_fields = ('created','modified')
+    list_display = ('name', "created", 'modified',
                     "releaseDateTime", "cost", "isApproved", "artist")
-    fields = ['name', "artist", "creationDateTime",
+    fields = ['name', "artist", "created", 'modified',
                 "releaseDateTime", "cost", "isApproved"]
 
 
-admin.site.register(Album, AlbumAdmin, form=AlbumForm)
+admin.site.register(Album, AlbumAdmin, form=AlbumForm )
+

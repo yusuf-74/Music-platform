@@ -1,9 +1,12 @@
 from django.db import models
 from artists.models import *
 from datetime import datetime
+from model_utils.models import TimeStampedModel
 
 
-class Album(models.Model):
+
+
+class Album(TimeStampedModel):
     name = models.CharField(
         max_length=150,
         default='New Album'
