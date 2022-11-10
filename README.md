@@ -1,76 +1,63 @@
-1.Add a boolean field to the album model that will help us represent whether an album is approved by an admin or not
+1.Instead of having an explicit created_at field in the Album model, inherit from TimeStampedModel
 
-   - tip: follow the convention for boolean field names
-   - hint: what's the suitable default value for this field, ( ```True``` or ```False``` )?
 
 ```python
-    isApproved = models.BooleanField(default = False , verbose_name = 'Approved')
+    class Album(TimeStampedModel):
 ```
 <br/>
 <br/>
 
-2.Add all models you have so far to django admin
+2.Create a form that allows a user to create an artist (it should be available at http://localhost:8000/artists/create)
 
-- Albums
+<img src = './readme elements/artist_form.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
 
-```python
-from django.contrib import admin
-from .models import *
-from .forms import AlbumForm
+3.Create a form that allows a user to create an album (it should be available at https://localhost:8000/albums/create)
 
-admin.site.register(Album, AlbumAdmin, form=AlbumForm)
-```
-- Artists
+<img src = './readme elements/albums_form.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
 
-```python
-from django.contrib import admin
-from .models import *
+  - (bonus) can you use a user friendly date/time input widget for the release datetime field instead of a plain text
+input field?
 
-admin.site.register(Artist, ArtistAdmin)
-```
-3.The admin shouldn't be able to modify the creation time field on the album 
-
-```python
-class AlbumAdmin(admin.ModelAdmin):
-    readonly_fields = ('creationDateTime',) <----
-    list_display = ('name', "creationDateTime",
-                    "releaseDateTime", "cost", "isApproved", "artist")
-    fields = ['name', "artist", "creationDateTime",
-                "releaseDateTime", "cost", "isApproved"]
+```html
+<input
+    type="datetime-local"
+    id="releasing"
+    class="form-control form-control-lg"
+    style = 'border : 1px solid black'
+/>
 ```
 
-4. Add a help text that would show up under the previously mentioned boolean field on the django admin form, it should
-state:
+4. For both forms, when the validation fails, the user should see errors displayed in red text on top of the form letting the
+user know what the error is
 
-```python
-from django import forms
-from .models import Album
-
-
-class AlbumForm(forms.ModelForm):
-    isApproved = forms.BooleanField(
-        required=False, help_text="Approve the album if its name is not explicit")
-
-    class Meta:
-        model = Album
-        fields ='__all__'
-
-```
-5. When viewing the list of artists, there must be a column to show the number of approved albums for each artist
-
-- in models.py
-```python
-@property
-def Approved_Albums(self):
-    return str(len(self.albums.filter(isApproved=True)))
-    
+```javascript
+    if (response.status === 'OK')
+        {
+            status.innerHTML = "created successfully"
+            status.style = 'color : green;'
+        }
+    else 
+        {
+            status.innerHTML = response.massage
+            status.style = 'color : red;'
+        }
 ```
 
-- at admin.py
-```python
-class ArtistAdmin(admin.ModelAdmin):
-    readonly_fields = ('Approved_Albums',)
-    list_display = ('stageName', 'socialLink', 'Approved_Albums')
-    fields = ['stageName', 'socialLink', 'Approved_Albums']
+5. Create a template view that lists all the albums grouped by each artist 
+(it should be available at https://localhost:8000/artists/)
 
+<img src = './readme elements/artists_list.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
+
+- Fetch the queryset above in an optimized manner
+
+```python
+artists = Artist.objects.all()
+albums  = Album.objects.all()
+mydata = list(Artist.objects.all().values())
+i = 0
+for artist in artists:
+    mydata[i]['albums'] = list(albums.filter(artist = artist).values())
+    i+=1
+context = { 'artists' : mydata}
+return render(request , 'artists/artists-view.html' , context=context)
 ```
