@@ -1,4 +1,4 @@
-1.Instead of having an explicit created_at field in the Album model, inherit from TimeStampedModel
+1. Instead of having an explicit created_at field in the Album model, inherit from TimeStampedModel
 
 
 ```python
@@ -7,11 +7,11 @@
 <br/>
 <br/>
 
-2.Create a form that allows a user to create an artist (it should be available at http://localhost:8000/artists/create)
+2. Create a form that allows a user to create an artist (it should be available at http://localhost:8000/artists/create)
 
 <img src = './readme elements/artist_form.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
 
-3.Create a form that allows a user to create an album (it should be available at https://localhost:8000/albums/create)
+3. Create a form that allows a user to create an album (it should be available at https://localhost:8000/albums/create)
 
 <img src = './readme elements/albums_form.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
 
