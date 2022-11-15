@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import *
-from .forms import AlbumForm
+from .forms import *
 
 
 class AlbumAdmin(admin.ModelAdmin):
@@ -11,5 +11,10 @@ class AlbumAdmin(admin.ModelAdmin):
                 "releaseDateTime", "cost", "isApproved"]
 
 
+class SongAdmin(admin.ModelAdmin):
+    list_display = ('name', "album")
+    fields = ['name', "album"]
+
 admin.site.register(Album, AlbumAdmin, form=AlbumForm )
+admin.site.register(Song, form=SongForm)
 

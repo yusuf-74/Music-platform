@@ -1,3 +1,4 @@
+{% load static %} 
 <link
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     rel="stylesheet"
@@ -106,45 +107,4 @@
     </div>
 </section>
 
-<script> 
-const btn = document.getElementById('create-btn')
-const name = document.getElementById("name");
-const cost = document.getElementById("cost");
-const artist = document.getElementById("artist");
-const releasing = document.getElementById("releasing")
-const status = document.getElementById('status')
-
-
-btn.addEventListener('click' , ()=> {
-
-    console.log('hola')
-
-    fetch("http://127.0.0.1:8000/albums/create/", {
-        method: "POST",
-        headers: {
-            Accept: "application/json", 
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({'name':name.value , 'cost': cost.value ,'releaseDateTime' : releasing.value , 'stageName':artist.value}),
-        })
-        .then((response) => response.json())
-        .then((response) => {
-            
-            if (response.status === 'OK')
-                {
-                    status.innerHTML = "created successfully"
-                    status.style = 'color : green;'
-                }
-            else if (response.status === 'validation error')
-                {
-                    status.innerHTML = 'validation error'
-                    status.style = 'color : red;'
-                }
-            else 
-            {
-                    status.innerHTML = 'something went wrong'
-                    status.style = 'color : red;'
-                }
-
-    });
-})</script>
+<script src = "{% static 'js/create-album.js' %}"> </script>

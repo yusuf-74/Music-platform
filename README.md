@@ -1,63 +1,90 @@
-1. Instead of having an explicit created_at field in the Album model, inherit from TimeStampedModel
+1. Change all the current views you have to class based views, from now on we'll only be creating class based views
+
 
 
 ```python
-    class Album(TimeStampedModel):
+   from django.views import View
+
+   class ListAlbum(View):
+    pass
+
 ```
 <br/>
 <br/>
 
-2. Create a form that allows a user to create an artist (it should be available at http://localhost:8000/artists/create)
+2. Add a sign in page using which a user can provide their username and password to get authenticated
 
-<img src = './readme elements/artist_form.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
+-  ***Registration Form***
 
-3. Create a form that allows a user to create an album (it should be available at https://localhost:8000/albums/create)
+<img src = './readme elements/register.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
 
-<img src = './readme elements/albums_form.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
+-  ***Login Form***  
 
-  - (bonus) can you use a user friendly date/time input widget for the release datetime field instead of a plain text
-input field?
+<img src = './readme elements/login.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
 
-```html
-<input
-    type="datetime-local"
-    id="releasing"
-    class="form-control form-control-lg"
-    style = 'border : 1px solid black'
-/>
-```
 
-4. For both forms, when the validation fails, the user should see errors displayed in red text on top of the form letting the
-user know what the error is
-
-```javascript
-    if (response.status === 'OK')
-        {
-            status.innerHTML = "created successfully"
-            status.style = 'color : green;'
-        }
-    else 
-        {
-            status.innerHTML = response.massage
-            status.style = 'color : red;'
-        }
-```
-
-5. Create a template view that lists all the albums grouped by each artist 
-(it should be available at https://localhost:8000/artists/)
-
-<img src = './readme elements/artists_list.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
-
-- Fetch the queryset above in an optimized manner
+3. Allow unauthenticated users to access the endpoint https://localhost:8000/artists/, but only authenticated users can
+access the creation form pages
 
 ```python
-artists = Artist.objects.all()
-albums  = Album.objects.all()
-mydata = list(Artist.objects.all().values())
-i = 0
-for artist in artists:
-    mydata[i]['albums'] = list(albums.filter(artist = artist).values())
-    i+=1
-context = { 'artists' : mydata}
-return render(request , 'artists/artists-view.html' , context=context)
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+class ArtistViewCreate(LoginRequiredMixin,View):
+    login_url = 'login'
+
+```
+
+4. We received a requirement that each album must have at least one song. In the albums app, create a song model that
+consists of:
+
+-  A name (if no name is provided, the song's name defaults to the album name)
+-  An image (required)
+-  An image thumbnail with JPEG format (hint: use ImageKit )
+
+```python
+
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
+
+class Song(models.Model):
+    name = models.CharField(
+        max_length=150,
+        default='New Song'
+    )
+    image = models.ImageField(upload_to='songs/%y/%m/%d')
+    
+    thumbnailImage = ImageSpecField(source='image',
+    processors = [ResizeToFill(100, 50)],
+    format = 'JPEG',
+    options = {'quality': 60})
+    
+    album = models.ForeignKey(  Album,
+                                on_delete=models.PROTECT,
+                                related_name='songs')
+    
+    audioFile = models.FileField(upload_to= 'audio/%y/%m/%d')
+    
+    def __str__(self):
+        return self.name
+```
+
+4. Setup your server to serve the uploaded media files, for example, I should be able to view a song's image by
+accessing its url: http://127.0.0.1:8000/YOUR_MEDIA_PATH/image.jpg
+
+-  settings.py
+
+```python
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    MEDIA_URL = 'media/'
+```
+-  urls.py
+```python
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('artists/' , include('artists.urls')),
+    path('albums/', include('albums.urls')),
+    path('auth/' , include('authentication.urls')),
+    
+]+static(settings.MEDIA_URL ,document_root = settings.MEDIA_ROOT )
 ```

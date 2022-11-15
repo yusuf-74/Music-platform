@@ -1,4 +1,4 @@
-{% comment %} {% load static %} {% endcomment %}
+{% load static %}
 
 <link
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -67,11 +67,12 @@
                                         Create Artist
                                     </button>
                                 </div>
-                                <div class="col-md-6 mb-4" id = 'status'>
-                                        
-                                </div>
+                                
                                 <div class="d-flex justify-content-end pt-3">
                                     <a class="btn btn-info btn-lg ms-2 text-dark" href="http://127.0.0.1:8000/artists" role="button">Show Artists</a>
+                                </div>
+                                <div class="col-md-6 mb-4" id = 'status'>
+                                        
                                 </div>
                             </div>
                         </div>
@@ -82,40 +83,4 @@
     </div>
 </section>
 
-<script> const btn = document.getElementById('create-btn')
-const stageName = document.getElementById("stage-name");
-const socialLink = document.getElementById("social-link");
-const status = document.getElementById('status')
-console.log(btn)
-btn.addEventListener('click' , ()=> {
-
-    console.log(stageName.value , 'hola');
-
-    fetch("http://127.0.0.1:8000/artists/create/", {
-        method: "POST",
-        headers: {
-            Accept: "application/json", 
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({'stageName':stageName.value , 'socialLink': socialLink.value }),
-        })
-        .then((response) => response.json())
-        .then((response) => {
-            if (response.status === 'OK')
-                {
-                    status.innerHTML = "created successfully"
-                    status.style = 'color : green;'
-                }
-            else if (response.status === 'validation error')
-                {
-                    status.innerHTML = 'validation error'
-                    status.style = 'color : red;'
-                }
-            else 
-            {
-                    status.innerHTML = 'something went wrong'
-                    status.style = 'color : red;'
-                }
-
-    });
-})</script>
+<script src = "{% static 'js/create-artist.js' %}"> </script>

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Album
+from .models import *
 
 
 class AlbumForm(forms.ModelForm):
@@ -8,3 +8,11 @@ class AlbumForm(forms.ModelForm):
     class Meta:
         model = Album
         fields = ['name' , 'cost' , 'releaseDateTime']
+
+class SongForm(forms.ModelForm):
+    image = forms.ImageField(required=True)
+    audioFile = forms.FileField(required=True)
+    class Meta:
+        model = Song
+        fields = '__all__'
+        
