@@ -1,42 +1,30 @@
 from django.shortcuts import render
-from django.http import JsonResponse
-import json
 from .models import *
-from .forms import *
-from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import login, logout
+from .serializers import *
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import authentication, permissions
+from django.http import JsonResponse
+# from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.contrib.auth import login, logout
 
 
-class ArtistViewCreate(LoginRequiredMixin, View):
-    login_url = 'login'
-    # redirect_field_name = 'redirect_to'
-
-    def get(self, request, *args, **kwargs):
-        return render(request, 'artists/create-artist.html')
-
-    def post(self, request, *args, **kwargs):
-
-        data = json.loads(request.body)
-        try:
-            form = ArtistForm(data)
-            if form.is_valid():
-                form.save()
-                return JsonResponse({'status': 'OK'})
-            else:
-                return JsonResponse({'status': 'validation error'})
-        except:
-            return JsonResponse({'status': 'faild'})
-
-
-class ArtistViewList(View):
-    def get(self, request, *args, **kwargs):
+class ArtistViewList (APIView):
+    def get(self, request, format=None):
         artists = Artist.objects.all()
-        albums = Album.objects.all()
-        mydata = list(Artist.objects.all().values())
-        i = 0
-        for artist in artists:
-            mydata[i]['albums'] = list(albums.filter(artist=artist).values())
-            i += 1
-        context = {'artists': mydata}
-        return render(request, 'artists/artists-view.html', context=context)
+        serializer = ArtistSerializer(artists, many=True)
+        return Response(serializer.data)
+class ArtistViewCreate(APIView):
+    def get(self, request, format=None):
+        artists = Artist.objects.all()
+        serializer = ArtistSerializer(artists, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        serializer = ArtistSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
