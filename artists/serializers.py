@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import *
 from django.core.exceptions import ValidationError
 from albums.serializers import AlbumSerializer
+from rest_framework.validators import UniqueValidator
 
 def checkBlank(str):
     if str == '':
@@ -11,7 +12,7 @@ def checkBlank(str):
 class ArtistSerializer(serializers.ModelSerializer):
     stageName = serializers.CharField(
         max_length=100,
-        validators=[checkBlank]
+        validators=[checkBlank ,UniqueValidator(queryset=Artist.objects.all())]
     )
     socialLink = serializers.URLField(max_length=250, validators=[checkBlank])
     

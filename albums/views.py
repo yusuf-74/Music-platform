@@ -3,29 +3,24 @@ from django.http import JsonResponse
 import json
 from .models import *
 from .forms import *
+from .serializers import *
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import authentication, permissions
 from django.contrib.auth import authenticate, login, logout
 
-class ListAlbum(LoginRequiredMixin,View):
-    login_url = 'login'
-    def get(self,request,*args, **kwargs):
-        return render(request,  'albums/create-album.html')
-    
+class ListAlbum(APIView):
+    def get(self,request):
+        albums = Album.objects.all()
+        serializer = AlbumSerializer(albums, many=True)
+        return Response(serializer.data)
     
     def post(self,request):
-        data = json.loads(request.body)
-        try:
-            target = Artist.objects.get(stageName=data['stageName'])
-            form = AlbumForm(data)
-            if form.is_valid():
-                album = form.save(commit=False)
-                album.artist = target
-                album.save()
-                return JsonResponse({'status': 'OK'})
-            else:
-                return JsonResponse({'status': form.errors})
-        except:
-            return JsonResponse({'status': {'Stage Name' : ['No such artist']}})
-        
-
+        serializer = AlbumSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

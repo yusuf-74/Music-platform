@@ -1,90 +1,95 @@
-1. Change all the current views you have to class based views, from now on we'll only be creating class based views
+1. Feel free to remove any non-API views that we created from before
 
 
 
-```python
-   from django.views import View
+2. Create a class-based view at the path /artists/ that returns a list of artists in JSON format for GET requests, the artist
+data should include the following fields.
 
-   class ListAlbum(View):
-    pass
-
-```
-<br/>
-<br/>
-
-2. Add a sign in page using which a user can provide their username and password to get authenticated
-
--  ***Registration Form***
-
-<img src = './readme elements/register.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
-
--  ***Login Form***  
-
-<img src = './readme elements/login.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
-
-
-3. Allow unauthenticated users to access the endpoint https://localhost:8000/artists/, but only authenticated users can
-access the creation form pages
+-  ***code***
 
 ```python
-from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
-
-class ArtistViewCreate(LoginRequiredMixin,View):
-    login_url = 'login'
-
+class ArtistViewList (APIView):
+    def get(self, request, format=None):
+        artists = Artist.objects.all()
+        serializer = ArtistSerializer(artists, many=True)
+        return Response(serializer.data)
 ```
 
-4. We received a requirement that each album must have at least one song. In the albums app, create a song model that
-consists of:
+-  ***image***
 
--  A name (if no name is provided, the song's name defaults to the album name)
--  An image (required)
--  An image thumbnail with JPEG format (hint: use ImageKit )
+<img src = './readme elements/get_artists.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
+
+
+
+3.  The same view above should accept POST requests and accept all the fields on the artist model (excluding the id)
+
+- Include proper validation for each field as listed on the artist model:
+  - this field is required
+  - this field value already exists (for unique fields)
+- If the request passes the validation process, the given data should be used to create and save an artist instance
+
+***code*** - **views.py**
 
 ```python
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
-from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill
+class ArtistViewCreate(APIView):
+    def get(self, request, format=None):
+        artists = Artist.objects.all()
+        serializer = ArtistSerializer(artists, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        serializer = ArtistSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class Song(models.Model):
-    name = models.CharField(
-        max_length=150,
-        default='New Song'
+```
+***code*** - **serializers.py**
+
+```python
+from rest_framework import serializers
+from .models import *
+from django.core.exceptions import ValidationError
+from albums.serializers import AlbumSerializer
+from rest_framework.validators import UniqueValidator
+
+def checkBlank(str):
+    if str == '':
+        raise ValidationError('null not allowed')
+
+class ArtistSerializer(serializers.ModelSerializer):
+    stageName = serializers.CharField(
+        max_length=100,
+        validators=[checkBlank ,UniqueValidator(queryset=Artist.objects.all())]
     )
-    image = models.ImageField(upload_to='songs/%y/%m/%d')
+    socialLink = serializers.URLField(max_length=250, validators=[checkBlank])
     
-    thumbnailImage = ImageSpecField(source='image',
-    processors = [ResizeToFill(100, 50)],
-    format = 'JPEG',
-    options = {'quality': 60})
-    
-    album = models.ForeignKey(  Album,
-                                on_delete=models.PROTECT,
-                                related_name='songs')
-    
-    audioFile = models.FileField(upload_to= 'audio/%y/%m/%d')
-    
-    def __str__(self):
-        return self.name
-```
+    albums = AlbumSerializer(many = True , required = False)
 
-4. Setup your server to serve the uploaded media files, for example, I should be able to view a song's image by
-accessing its url: http://127.0.0.1:8000/YOUR_MEDIA_PATH/image.jpg
+    class Meta:
+        model = Artist
+        fields = '__all__'
 
--  settings.py
+```
+***image of*** **Bad request**
 
-```python
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-    MEDIA_URL = 'media/'
-```
--  urls.py
-```python
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('artists/' , include('artists.urls')),
-    path('albums/', include('albums.urls')),
-    path('auth/' , include('authentication.urls')),
-    
-]+static(settings.MEDIA_URL ,document_root = settings.MEDIA_ROOT )
-```
+<img src = './readme elements/bad_post.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
+
+***image of*** **good request**
+
+<img src = './readme elements/good_post.png' style = 'width : 800px; margin : 24px 0 48px 24px'/>
+
+5. You may want to use a tool to make the HTTP requests and inspect them, I personally use **Postman** but there are other
+options like **curl** and **Insomnia**
+
+**Done** : ***i used Postman***
+
