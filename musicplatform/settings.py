@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from dotenv import load_dotenv, find_dotenv
 from pathlib import Path
+from datetime import timedelta
+from rest_framework.settings import api_settings
 import os
 import dotenv
 
@@ -47,8 +49,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'artists',
     'albums',
-    'authentication',
     'rest_framework',
+    'users',
+    'knox',
     'django_extensions',
     'imagekit',
 ]
@@ -83,7 +86,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'musicplatform.wsgi.application'
 
-
+AUTH_USER_MODEL = 'users.User'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -113,12 +116,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+REST_KNOX = {
+  'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
+  'AUTH_TOKEN_CHARACTER_LENGTH': 64,
+  'TOKEN_TTL': timedelta(hours=10),
+  'USER_SERIALIZER': 'knox.serializers.UserSerializer',
+  'TOKEN_LIMIT_PER_USER': None,
+  'AUTO_REFRESH': False,
+  'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT,
+}
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ]
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'knox.auth.TokenAuthentication',
+    ]
 }
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

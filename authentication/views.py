@@ -1,42 +1,32 @@
-from django.shortcuts import render,redirect
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate,login,logout
-from django.views import View
-import json
-from django.http import JsonResponse
+from rest_framework import generics, permissions
+from rest_framework.response import Response
+from knox.models import AuthToken
+from .serializers import *
+from users.serializers import *
+from knox.auth import TokenAuthentication
 
-class LoginView(View):
-    def get(self,request,*args, **kwargs):
-        return render(request , 'auth/log-in.html')
-    
+
+class RegisterAPI(generics.GenericAPIView):
+    serializer_class = RegisterSerializer
     def post(self, request, *args, **kwargs):
-        data = json.loads(request.body)
-        user = authenticate(username = data['userName'] , password = data['password'] )
-        if user is not None:
-            login(request, user)
-            return JsonResponse({'status': 'OK'})
-        else :
-            return JsonResponse({'status': {'username': ['invalid username or password !']}})
-    
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "token": AuthToken.objects.create(user)[1]
+        })
 
-class RegisterView(View):
-    def get(self, request, *args, **kwargs):
-        return render(request, 'auth/register.html')
-    
-    def post(self,request,*args, **kwargs):
-        data = json.loads(request.body)
-        if data['pass1'] == data['pass2']:
-            try:
-                if User.objects.get(username=data['userName']):
-                    return JsonResponse({'status': 'exist'})
-            except:
-                try:
-                    user = User(username=data['userName'], password=data['pass1'],
-                                first_name=data['firstName'], last_name=data['lastName'])
-                    user.save()
-                    login(request,user)
-                    return JsonResponse({'status' : 'OK'})
-                except:
-                    return JsonResponse({'status' : 'faild'})
-        return JsonResponse({'status' : 'password'})
-        
+
+class LoginAPI(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+        token = AuthToken.objects.create(user)[1]
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "token": token
+        })

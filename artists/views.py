@@ -6,12 +6,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import authentication, permissions
 from django.http import JsonResponse
-# from django.contrib.auth.mixins import LoginRequiredMixin
-# from django.contrib.auth import login, logout
+from django.contrib.auth import logout
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 
 
 class ArtistViewList (APIView):
     def get(self, request, format=None):
+        logout(request)
         artists = Artist.objects.all()
         serializer = ArtistSerializer(artists, many=True)
         return Response(serializer.data)

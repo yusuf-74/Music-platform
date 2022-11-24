@@ -18,6 +18,7 @@ djangorestframework = "^3.14.0"
 Markdown = "^3.4.1"
 django-filter = "^22.1"
 Pygments = "^2.13.0"
+django-rest-knox = "^4.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
