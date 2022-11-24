@@ -10,7 +10,7 @@ django-admin startapp users
 3.  In the users app, extend Django's user model by inheriting from AbstractUser to include an optional bio
 CharField with a max length of 256 characters
 
--  ***at users.models.py***
+***at users.models.py***
 ```python
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -20,6 +20,7 @@ class User(AbstractUser):
 ```
 
 -  On django admin, this field should be displayed as a TextArea
+
 ***forms.py***
 ```py
 from django import forms
@@ -67,6 +68,7 @@ urlpatterns = [
 ```
 
 -  Think about the suitable permission class(es) for this endpoint
+
 **it should be allow any**
 
 -  This endpoint must accept the following fields formatted in JSON:
