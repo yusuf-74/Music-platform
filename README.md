@@ -20,6 +20,7 @@ class User(AbstractUser):
 ```
 
 -  On django admin, this field should be displayed as a TextArea
+
 ***forms.py***
 ```py
 from django import forms
