@@ -4,6 +4,7 @@ from knox.models import AuthToken
 from .serializers import *
 from users.serializers import *
 from knox.auth import TokenAuthentication
+from rest_framework.status import *
 
 
 class RegisterAPI(generics.GenericAPIView):
@@ -12,10 +13,10 @@ class RegisterAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        return Response({
+        return Response(data={
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
-        })
+        }, status=HTTP_201_CREATED)
 
 
 class LoginAPI(generics.GenericAPIView):
@@ -26,7 +27,7 @@ class LoginAPI(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
         token = AuthToken.objects.create(user)[1]
-        return Response({
+        return Response(data={
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": token
-        })
+        },status=HTTP_202_ACCEPTED)

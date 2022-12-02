@@ -8,14 +8,14 @@ from django.views import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.permissions import IsAuthenticated
 
 class ListAlbum(APIView):
     def get(self,request):
         albums = Album.objects.all()
         serializer = AlbumSerializer(albums, many=True)
-        return Response(serializer.data)
-    
+        return Response(data = serializer.data , status=status.HTTP_200_OK)
+
     def post(self,request):
         serializer = AlbumSerializer(data=request.data)
         if serializer.is_valid():

@@ -3,8 +3,8 @@ from .models import *
 
 
 class SongSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(required=True)
-    audioFile = serializers.FileField(required=True)
+    image = serializers.ImageField(required=False)
+    audioFile = serializers.FileField(required=False)
     
 
     class Meta:

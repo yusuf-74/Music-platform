@@ -52,8 +52,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'knox',
+    'authentication',
     'django_extensions',
     'imagekit',
+    'rest_framework.authtoken',
+    'rest_auth',
 ]
 
 MIDDLEWARE = [
@@ -127,10 +130,20 @@ REST_KNOX = {
   'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT,
 }
 REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'knox.auth.TokenAuthentication',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 3,
+    'DATE_INPUT_FORMATS': ("%d/%m/%Y %H:%M:%S",),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
