@@ -7,7 +7,16 @@ from rest_framework.validators import UniqueValidator
 def checkBlank(str):
     if str == '':
         raise ValidationError('null not allowed')
+class ArtistSerializerForAlbum(serializers.ModelSerializer):
+    stageName = serializers.CharField(
+        max_length=100,
+        validators=[checkBlank, UniqueValidator(queryset=Artist.objects.all())]
+    )
+    socialLink = serializers.URLField(max_length=250, validators=[checkBlank])
 
+    class Meta:
+        model = Artist
+        exclude = ['user']
 
 class ArtistSerializer(serializers.ModelSerializer):
     stageName = serializers.CharField(
@@ -21,3 +30,6 @@ class ArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
         fields = '__all__'
+
+
+

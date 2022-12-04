@@ -7,17 +7,29 @@ from .serializers import *
 from django.views import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import status, generics
+from rest_framework.permissions import IsAuthenticated , AllowAny
+from .filters import AlbumFilter
 
-class ListAlbum(APIView):
-    def get(self,request):
-        albums = Album.objects.all()
-        serializer = AlbumSerializer(albums, many=True)
-        return Response(data = serializer.data , status=status.HTTP_200_OK)
+class ListAlbum(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    queryset = Album.objects.all()
+    filterset_class = AlbumFilter
+    serializer_class = AlbumSerializer
 
-    def post(self,request):
-        serializer = AlbumSerializer(data=request.data)
+
+
+class CreateAlbum(generics.CreateAPIView):
+    def post(self, request):
+        data = request.data
+        user = request.user
+        try:
+            data ['artist'] = Artist.objects.get(user=user).pk
+        except:
+            return Response("user is not registered as artist" , status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = CreateAlbumSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
