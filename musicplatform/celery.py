@@ -16,10 +16,12 @@ app.config_from_object('django.conf:settings', namespace='CELERY_CONF')
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
+#        S  * M  * H  * D
+period = 60 * 60 * 24 * 14
 app.conf.beat_schedule = {
     'hommos': {
-        'task': 'musicplatform.tasks.hommos',
-        'schedule': 5,
+        'task': 'albums.tasks.fetch_data',
+        'schedule': period,
     },
     }
 

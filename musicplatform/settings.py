@@ -15,13 +15,12 @@ from pathlib import Path
 from datetime import timedelta
 from rest_framework.settings import api_settings
 import os
-import dotenv
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(find_dotenv())
 
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = config("SECRET_KEY")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 
@@ -183,11 +182,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'my.django.app.2000@gmail.com'
-EMAIL_HOST_PASSWORD = 'ykftxoailvnayjcb'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'my.django.app.2000@gmail.com'
+# EMAIL_HOST_PASSWORD = 'ykftxoailvnayjcb'
 
 CELERY_CONF_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_CONF_ACCEPT_CONTENT = ['application/json']
@@ -197,3 +196,21 @@ CELERY_CONF_RESULT_BACKEND = 'django-db'
 CELERY_CONF_CACHE_BACKEND = 'django-cache'
 CELERY_CONF_TASK_TRACK_STARTED = True
 CELERY_CONF_TASK_TIME_LIMIT = 30 * 60
+
+
+
+# EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+# EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+# CELERY_CONF_BROKER_URL =config('CELERY_CONF_BROKER_URL') 
+# CELERY_CONF_ACCEPT_CONTENT =config('CELERY_CONF_ACCEPT_CONTENT') 
+# CELERY_CONF_RESULT_SERIALIZER =config('CELERY_CONF_RESULT_SERIALIZER') 
+# CELERY_CONF_TASK_SERIALIZER =config('CELERY_CONF_TASK_SERIALIZER') 
+# CELERY_CONF_RESULT_BACKEND =config('CELERY_CONF_RESULT_BACKEND') 
+# CELERY_CONF_CACHE_BACKEND =config('CELERY_CONF_CACHE_BACKEND') 
+# CELERY_CONF_TASK_TRACK_STARTED =config('CELERY_CONF_TASK_TRACK_STARTED') 
+# CELERY_CONF_TASK_TIME_LIMIT =config('CELERY_CONF_TASK_TIME_LIMIT') 

@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 @app.task
 def fetch_data():
+    print("fetch")
     # fetch data from spotify every 14 days
     return
 
