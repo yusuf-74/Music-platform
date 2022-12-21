@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from .models import *
 from .serializers import *
 from rest_framework.views import APIView
@@ -11,6 +12,7 @@ from django.contrib.auth import logout
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .filters import *
+
 
 
 class ArtistViewList (generics.ListAPIView):
@@ -32,4 +34,5 @@ class ArtistViewCreate(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 

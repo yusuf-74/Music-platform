@@ -58,6 +58,9 @@ INSTALLED_APPS = [
     'imagekit',
     'rest_framework.authtoken',
     'rest_auth',
+    'django_celery_results',
+    'django_celery_beat',
+
 ]
 
 MIDDLEWARE = [
@@ -75,7 +78,7 @@ ROOT_URLCONF = 'musicplatform.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR/'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -176,3 +179,21 @@ MEDIA_URL = 'media/'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'my.django.app.2000@gmail.com'
+EMAIL_HOST_PASSWORD = 'ykftxoailvnayjcb'
+
+CELERY_CONF_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_CONF_ACCEPT_CONTENT = ['application/json']
+CELERY_CONF_RESULT_SERIALIZER = 'json'
+CELERY_CONF_TASK_SERIALIZER = 'json'
+CELERY_CONF_RESULT_BACKEND = 'django-db'
+CELERY_CONF_CACHE_BACKEND = 'django-cache'
+CELERY_CONF_TASK_TRACK_STARTED = True
+CELERY_CONF_TASK_TIME_LIMIT = 30 * 60

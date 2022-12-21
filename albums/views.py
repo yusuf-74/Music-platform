@@ -10,7 +10,8 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated , AllowAny
 from .filters import AlbumFilter
-
+from .tasks import send_album_creation_succeded_mail
+from users.serializers import UserSerializer
 class ListAlbum(generics.ListAPIView):
     permission_classes = [AllowAny]
     authentication_classes = []
@@ -24,13 +25,15 @@ class CreateAlbum(generics.CreateAPIView):
     def post(self, request):
         data = request.data
         user = request.user
+        
         try:
             data ['artist'] = Artist.objects.get(user=user).pk
         except:
             return Response("user is not registered as artist" , status=status.HTTP_403_FORBIDDEN)
-        
+        user = UserSerializer(user).data
         serializer = CreateAlbumSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            send_album_creation_succeded_mail.delay(user , data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
