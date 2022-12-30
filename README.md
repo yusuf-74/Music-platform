@@ -9,3 +9,4 @@ It consists of 9_task starting from just creating models (Artists && Albums && S
 # 9_Tasks done, each task is a branch in the project
 
 # each branch has its own README
+
